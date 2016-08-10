@@ -23,6 +23,7 @@ class XlsxOption extends OptionAbstract
             case ExportMenu::TARGET_BLANK:
                 Yii::$app->controller->layout = false;
                 $spoutObject->openToBrowser($this->filename . $this->extension);
+                // $spoutObject->openToFile('/tmp/testexcel2.xlsx'); // write data to a file or to a PHP stream
                 break;
             case ExportMenu::TARGET_QUEUE:
             default:
@@ -39,9 +40,12 @@ class XlsxOption extends OptionAbstract
 
         //body
         $bodyRows = $this->generateBody();
-        foreach ($bodyRows as $row) {
-            $spoutObject->addRow($row);
-        }
+        // $bodyRows = $this->dataProvider->query->asArray()->all();
+        // foreach ($bodyRows as $row) {
+        //     $spoutObject->addRow($row);
+        // }
+
+        $spoutObject->addRows($bodyRows); // add multiple rows at a time
 
         //footer
         $footerRow = $this->generateFooter();

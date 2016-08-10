@@ -102,7 +102,9 @@ abstract class OptionAbstract extends Object implements OptionInterface
                 }
             }
         } else {
+            $this->dataProvider->pagination->pageSize = $this->batchSize;
             $models = $this->dataProvider->getModels();
+
             while (count($models) > 0) {
                 /**
                  * @var int $index
