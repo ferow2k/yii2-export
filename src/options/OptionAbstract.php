@@ -162,7 +162,8 @@ abstract class OptionAbstract extends Object implements OptionInterface
         if ($column instanceof ActionColumn || $column instanceof CheckboxColumn) {
             return '';
         } else if ($column instanceof DataColumn) {
-            return $column->getDataCellValue($model, $key, $index);
+            $val = $column->getDataCellValue($model, $key, $index);
+            return Yii::$app->formatter->format($val, $column->format);
         } else if ($column instanceof Column) {
             return $column->renderDataCell($model, $key, $index);
         }
