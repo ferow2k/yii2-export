@@ -3,12 +3,12 @@
 namespace Da\export\options;
 
 use Yii;
-use yii\base\Object;
+use yii\base\BaseObject;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQueryInterface;
 use yii\grid\DataColumn;
 
-abstract class OptionAbstract extends Object implements OptionInterface
+abstract class OptionAbstract extends BaseObject implements OptionInterface
 {
     use GridViewTrait;
 
