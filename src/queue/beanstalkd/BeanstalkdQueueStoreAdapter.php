@@ -4,9 +4,9 @@ namespace Da\export\queue\beanstalkd;
 use Da\export\queue\JobInterface;
 use Da\export\queue\QueueStoreAdapterInterface;
 use Pheanstalk\Pheanstalk;
-use yii\base\Object;
+use yii\base\BaseObject;
 
-class BeanstalkdQueueStoreAdapter extends Object implements QueueStoreAdapterInterface
+class BeanstalkdQueueStoreAdapter extends BaseObject implements QueueStoreAdapterInterface
 {
     /**
      * @var string the queue name
