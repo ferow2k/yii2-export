@@ -3,9 +3,9 @@ namespace Da\export\queue\rabbitmq;
 
 use Da\export\queue\QueueStoreAdapterInterface;
 use PhpAmqpLib\Message\AMQPMessage;
-use yii\base\Object;
+use yii\base\BaseObject;
 
-class RabbitMqQueueStoreAdapter extends Object implements QueueStoreAdapterInterface
+class RabbitMqQueueStoreAdapter extends BaseObject implements QueueStoreAdapterInterface
 {
     /**
      * @var string the queue name
