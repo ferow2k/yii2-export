@@ -378,10 +378,8 @@ SCRIPT;
      */
     protected function parseDropDownItems ()
     {
-        $return = [];
-
         if (empty($this->dropDownItems)) {
-            $return = [
+            return [
                 self::FORMAT_CSV => [
                     'label' => 'CSV',
                     'options' => [
@@ -411,8 +409,7 @@ SCRIPT;
                 ]
             ];
         }
-
-        return $return;
+        return $this->dropDownItems;
     }
 
     /**
