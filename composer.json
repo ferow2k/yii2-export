@@ -1,5 +1,5 @@
 {
-  "name": "ericmaicon/yii2-export",
+  "name": "ferow2k/yii2-export",
   "description": "Just another yii2 export menu component.",
   "keywords": ["yii", "extension", "export"],
   "homepage": "https://github.com/ericmaicon/yii2-export",
@@ -9,6 +9,10 @@
     {
       "name": "Eric Maicon",
       "email": "eric@ericmaicon.com.br"
+    },
+    {
+      "name": "Fernando Wentland",
+      "email": "ferow2k@gmail.com"
     }
   ],
   "minimum-stability": "dev",
