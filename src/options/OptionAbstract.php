@@ -31,7 +31,7 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
     /**
      * @var int batch size to fetch the data provider
      */
-    public $batchSize = 2000;
+    public $batchSize = 500;
 
     /**
      * @var string filename without extension
@@ -43,6 +43,8 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
      * @var string how the page will delivery the report
      */
     public $target;
+
+    public $spoutObject;
 
     /**
      * @inheritdoc
@@ -59,11 +61,11 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
     }
 
     /**
-     * Generate the row array
+     * write the row array
      *
      * @return array|void
      */
-    protected function generateHeader()
+    protected function writeHeader()
     {
         if (empty($this->columns)) {
             return;
@@ -73,9 +75,9 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
         foreach ($this->columns as $column) {
             /** @var Column $column */
             $head = ($column instanceof DataColumn) ? $this->getColumnHeader($column) : $column->header;
-            $rowArray[] = WriterEntityFactory::createCell($head);
+            $rowArray[] = $head;
         }
-        return $rowArray;
+        $this->spoutObject->addRow(WriterEntityFactory::createRowFromArray($rowArray));
     }
 
     /**
@@ -83,13 +85,12 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
      *
      * @return array|void
      */
-    protected function generateBody()
+    protected function writeBody()
     {
         if (empty($this->columns)) {
             return;
         }
 
-        $rows = [];
         if ($this->dataProvider instanceof ActiveQueryInterface) {
             $query = $this->dataProvider->query;
             foreach ($query->batch($this->batchSize) as $models) {
@@ -99,7 +100,7 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
                  */
                 foreach ($models as $index => $model) {
                     $key = $model->getPrimaryKey();
-                    $rows[] = $this->generateRow($model, $key, $index);
+                    $this->writeRow($model, $key, $index);
                 }
             }
         } else {
@@ -113,8 +114,7 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
                  */
                 $keys = $this->dataProvider->getKeys();
                 foreach ($models as $index => $model) {
-                    $key = $keys[$index];
-                    $rows[] = $this->generateRow($model, $key, $index);
+                    $this->writeRow($model, $keys[$index], $index);
                 }
 
                 if ($this->dataProvider->pagination) {
@@ -126,26 +126,25 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
                 }
             }
         }
-
-        return $rows;
     }
 
     /**
-     * Generate the row array
+     * write the row array
      *
      * @param $model
      * @param $key
      * @param $index
      * @return array
      */
-    protected function generateRow($model, $key, $index)
+    protected function writeRow($model, $key, $index)
     {
         $row = [];
         foreach ($this->columns as $column) {
             $value = $this->getColumnValue($model, $key, $index, $column);
             $row[] = $value;
         }
-        return $row;
+        $this->spoutObject->addRow(WriterEntityFactory::createRowFromArray($row));
+        unset($row);
     }
 
     /**
@@ -173,11 +172,11 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
     }
 
     /**
-     * generate footer row array
+     * write footer row array
      *
      * @return array|void
      */
-    protected function generateFooter()
+    protected function writeFooter()
     {
         if (!$this->exportFooter) {
             return;
@@ -187,11 +186,18 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
             return;
         }
 
-        $rowsArray = [];
+        $row = [];
         foreach ($this->columns as $n => $column) {
             /** @var Column $column */
-            $rowsArray[] = trim($column->footer) !== '' ? $column->footer : '';
+            $row[] = trim($column->footer) !== '' ? $column->footer : '';
         }
-        return $rowsArray;
+        $this->spoutObject->addRow(WriterEntityFactory::createRowFromArray($row));
+    }
+
+    protected function writeFile()
+    {
+        $this->writeHeader();
+        $this->writeBody();
+        $this->writeFooter();
     }
 }

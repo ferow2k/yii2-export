@@ -4,7 +4,7 @@ namespace Da\export\options;
 
 use Yii;
 use OpenSpout\Common\Type;
-use OpenSpout\Common\Creator\WriterEntityFactory;
+use OpenSpout\Writer\Common\Creator\WriterEntityFactory;
 use Da\export\ExportMenu;
 
 class XlsxOption extends OptionAbstract
@@ -32,24 +32,8 @@ class XlsxOption extends OptionAbstract
                 break;
         }
 
-        //header
-        $headerRow = $this->generateHeader();
-        if (!empty($headerRow)) {
-            $spoutObject->addRow(WriterEntityFactory::createRow($headerRow));
-        }
-
-        //body
-        $bodyRows = $this->generateBody();
-        $bodyRows = $this->dataProvider->query->asArray()->all();
-        foreach ($bodyRows as $row) {
-            $spoutObject->addRow(WriterEntityFactory::createRow($row));
-        }
-
-        //footer
-        $footerRow = $this->generateFooter();
-        if (!empty($footerRow)) {
-            $spoutObject->addRow(WriterEntityFactory::createRow($footerRow));
-        }
+        $this->spoutObject = $spoutObject;
+        $this->writeFile();
 
         $spoutObject->close();
     }
