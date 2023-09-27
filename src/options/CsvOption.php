@@ -3,8 +3,8 @@
 namespace Da\export\options;
 
 use Yii;
-use Box\Spout\Common\Type;
-use Box\Spout\Writer\WriterFactory;
+use OpenSpout\Common\Type;
+use OpenSpout\Writer\Common\Creator\WriterEntityFactory;
 use Da\export\ExportMenu;
 
 class CsvOption extends OptionAbstract
@@ -17,7 +17,7 @@ class CsvOption extends OptionAbstract
     public function process()
     {
         //CSV object initialization
-        $spoutObject = WriterFactory::create(Type::CSV);
+        $spoutObject = WriterEntityFactory::createCSVWriter();
         switch ($this->target) {
             case ExportMenu::TARGET_SELF:
             case ExportMenu::TARGET_BLANK:
@@ -34,19 +34,19 @@ class CsvOption extends OptionAbstract
         //header
         $headerRow = $this->generateHeader();
         if (!empty($headerRow)) {
-            $spoutObject->addRow($headerRow);
+            $spoutObject->addRow(WriterEntityFactory::createRow($headerRow));
         }
 
         //body
         $bodyRows = $this->generateBody();
         foreach ($bodyRows as $row) {
-            $spoutObject->addRow($row);
+            $spoutObject->addRow(WriterEntityFactory::createRow($row));
         }
 
         //footer
         $footerRow = $this->generateFooter();
         if (!empty($footerRow)) {
-            $spoutObject->addRow($footerRow);
+            $spoutObject->addRow(WriterEntityFactory::createRow($footerRow));
         }
 
         $spoutObject->close();

@@ -2,6 +2,7 @@
 
 namespace Da\export\options;
 
+use OpenSpout\Writer\Common\Creator\WriterEntityFactory;
 use Yii;
 use yii\base\BaseObject;
 use yii\data\ActiveDataProvider;
@@ -72,7 +73,7 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
         foreach ($this->columns as $column) {
             /** @var Column $column */
             $head = ($column instanceof DataColumn) ? $this->getColumnHeader($column) : $column->header;
-            $rowArray[] = $head;
+            $rowArray[] = WriterEntityFactory::createCell($head);
         }
         return $rowArray;
     }
@@ -161,10 +162,10 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
         /** @var Column $column */
         if ($column instanceof ActionColumn || $column instanceof CheckboxColumn) {
             return '';
-        } else if ($column instanceof DataColumn) {
+        } elseif ($column instanceof DataColumn) {
             $val = $column->getDataCellValue($model, $key, $index);
             return Yii::$app->formatter->format($val, $column->format);
-        } else if ($column instanceof Column) {
+        } elseif ($column instanceof Column) {
             return $column->renderDataCell($model, $key, $index);
         }
 

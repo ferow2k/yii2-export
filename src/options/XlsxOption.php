@@ -3,8 +3,8 @@
 namespace Da\export\options;
 
 use Yii;
-use Box\Spout\Common\Type;
-use Box\Spout\Writer\WriterFactory;
+use OpenSpout\Common\Type;
+use OpenSpout\Common\Creator\WriterEntityFactory;
 use Da\export\ExportMenu;
 
 class XlsxOption extends OptionAbstract
@@ -17,7 +17,7 @@ class XlsxOption extends OptionAbstract
     public function process()
     {
         //XLSX object initialization
-        $spoutObject = WriterFactory::create(Type::XLSX);
+        $spoutObject = WriterEntityFactory::createXLSXWriter();
         switch ($this->target) {
             case ExportMenu::TARGET_SELF:
             case ExportMenu::TARGET_BLANK:
@@ -35,22 +35,20 @@ class XlsxOption extends OptionAbstract
         //header
         $headerRow = $this->generateHeader();
         if (!empty($headerRow)) {
-            $spoutObject->addRow($headerRow);
+            $spoutObject->addRow(WriterEntityFactory::createRow($headerRow));
         }
 
         //body
         $bodyRows = $this->generateBody();
-        // $bodyRows = $this->dataProvider->query->asArray()->all();
-        // foreach ($bodyRows as $row) {
-        //     $spoutObject->addRow($row);
-        // }
-
-        $spoutObject->addRows($bodyRows); // add multiple rows at a time
+        $bodyRows = $this->dataProvider->query->asArray()->all();
+        foreach ($bodyRows as $row) {
+            $spoutObject->addRow(WriterEntityFactory::createRow($row));
+        }
 
         //footer
         $footerRow = $this->generateFooter();
         if (!empty($footerRow)) {
-            $spoutObject->addRow($footerRow);
+            $spoutObject->addRow(WriterEntityFactory::createRow($footerRow));
         }
 
         $spoutObject->close();

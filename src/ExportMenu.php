@@ -16,17 +16,17 @@ class ExportMenu extends Widget
     /**
      * Export formats
      */
-    const FORMAT_CSV = 'CSV';
-    const FORMAT_EXCEL = 'Excel5';
-    const FORMAT_EXCEL_X = 'Excel2007';
+    public const FORMAT_CSV = 'CSV';
+    public const FORMAT_EXCEL = 'Excel5';
+    public const FORMAT_EXCEL_X = 'Excel2007';
 
     /**
      * Targets available
      */
-    const TARGET_SELF = '_self';
-    const TARGET_BLANK = '_blank';
+    public const TARGET_SELF = '_self';
+    public const TARGET_BLANK = '_blank';
 
-    const TARGET_QUEUE = 'queue';
+    public const TARGET_QUEUE = 'queue';
 
     /**
      * @see OptionAbstract
@@ -133,6 +133,9 @@ class ExportMenu extends Widget
     public function init()
     {
         if (empty($this->exportRequestParam)) {
+            if (!isset($this->options['id'])) {
+                $this->options['id'] = $this->getId();
+            }
             $this->exportRequestParam = 'exportFull_' . $this->options['id'];
         }
 
@@ -159,7 +162,7 @@ class ExportMenu extends Widget
         $this->renderForm();
     }
 
-    protected function dispatchQueue ()
+    protected function dispatchQueue()
     {
         if (!array_key_exists('queueName', $this->queueConfig)) {
             throw new InvalidConfigException("Your queueConfig param needs to have 'queueName' index.");
@@ -195,7 +198,7 @@ class ExportMenu extends Widget
     /**
      * Set whether is to download or not
      */
-    public function setSelectedOption ()
+    public function setSelectedOption()
     {
         $this->selectedOption = Yii::$app->request->post($this->exportRequestParam);
     }
@@ -203,7 +206,7 @@ class ExportMenu extends Widget
     /**
      * Perform the report download
      */
-    public function triggerDownload ()
+    public function triggerDownload()
     {
         $items = $this->parseDropDownItems();
 
@@ -231,7 +234,7 @@ class ExportMenu extends Widget
     /**
      * Remove previous HTML rendered
      */
-    protected function clearBuffers ()
+    protected function clearBuffers()
     {
         while (ob_get_level() > 0) {
             ob_end_clean();
@@ -241,7 +244,7 @@ class ExportMenu extends Widget
     /**
      * Render the export menu form
      */
-    protected function renderForm ()
+    protected function renderForm()
     {
         $options = $this->parseOptions();
         $formOptions = $this->parseFormOptions();
@@ -269,7 +272,7 @@ class ExportMenu extends Widget
      * @param $id
      * @return string
      */
-    protected function getScript ($id)
+    protected function getScript($id)
     {
         $exportRequestParam = $this->exportRequestParam;
 
@@ -287,7 +290,7 @@ SCRIPT;
      *
      * @return array
      */
-    protected function parseOptions ()
+    protected function parseOptions()
     {
         $options = $this->options;
 
@@ -307,7 +310,7 @@ SCRIPT;
      *
      * @return array
      */
-    protected function parseFormOptions ()
+    protected function parseFormOptions()
     {
         $options = $this->parseOptions();
 
@@ -331,7 +334,7 @@ SCRIPT;
      *
      * @return array
      */
-    protected function parseDropDownOptions ()
+    protected function parseDropDownOptions()
     {
         $dropDownOptions = [];
         $dropDownOptions['options'] = !empty($this->dropDownOptions['menuOptions']) ? $this->dropDownOptions['menuOptions'] : [];
@@ -345,7 +348,7 @@ SCRIPT;
      *
      * @return array
      */
-    protected function parseButtonOptions ()
+    protected function parseButtonOptions()
     {
         $buttonOptions = $this->dropDownOptions;
         unset($buttonOptions['menuOptions']);
@@ -376,7 +379,7 @@ SCRIPT;
      *
      * @return array
      */
-    protected function parseDropDownItems ()
+    protected function parseDropDownItems()
     {
         if (empty($this->dropDownItems)) {
             return [
@@ -387,7 +390,7 @@ SCRIPT;
                         'data-id' => self::FORMAT_CSV,
                     ],
                     'url' => 'javascript:;',
-                    'className' => CsvOption::className(),
+                    'className' => CsvOption::class,
                 ],
                 self::FORMAT_EXCEL => [
                     'label' => 'Excel 95 +',
@@ -396,7 +399,7 @@ SCRIPT;
                         'data-id' => self::FORMAT_EXCEL,
                     ],
                     'url' => 'javascript:;',
-                    'className' => XlsxOption::className(),
+                    'className' => XlsxOption::class,
                 ],
                 self::FORMAT_EXCEL_X => [
                     'label' => 'Excel 2007+',
@@ -405,7 +408,7 @@ SCRIPT;
                         'data-id' => self::FORMAT_EXCEL_X,
                     ],
                     'url' => 'javascript:;',
-                    'className' => XlsxOption::className(),
+                    'className' => XlsxOption::class,
                 ]
             ];
         }
@@ -418,7 +421,7 @@ SCRIPT;
      *
      * @return array
      */
-    protected function parseDownloadOptions ()
+    protected function parseDownloadOptions()
     {
         return [
             'filename' => $this->filename,

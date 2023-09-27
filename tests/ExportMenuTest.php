@@ -3,22 +3,31 @@
 namespace tests;
 
 use Da\export\ExportMenu;
-use Da\export\queue\beanstalkd\BeanstalkdQueueStoreAdapter;
-use tests\dummy\TestController;
+use Da\export\queue\rabbitmq\RabbitMqQueueStoreAdapter;
 use Yii;
 
-class ExportMenuTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class ExportMenuTest extends TestCase
 {
     /**
      *
      */
     public function testWidget()
     {
-        Yii::$app->controller = new TestController('test', Yii::$app);
+        Yii::$app = new \yii\web\Application([
+            'id' => 'test',
+            'basePath' => __DIR__,
+            'vendorPath' => __DIR__ . '/../vendor',
+            'components' => [
+                'request' => \yii\web\Request::class,
+            ],
+        ]);
+        Yii::$app->controller = new \yii\base\Controller('test', Yii::$app);
 
         $actual = ExportMenu::widget([]);
         $expected = file_get_contents(__DIR__ . '/data/test-form.bin');
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     /**
@@ -56,7 +65,7 @@ class ExportMenuTest extends \PHPUnit_Framework_TestCase
             'target' => ExportMenu::TARGET_QUEUE,
             'queueConfig' => [
                 'queueName' => 'test',
-                'queueAdapter' => BeanstalkdQueueStoreAdapter::className(),
+                'queueAdapter' => RabbitMqQueueStoreAdapter::class,
             ]
         ]);
     }
