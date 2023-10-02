@@ -91,7 +91,7 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
             return;
         }
 
-        if ($this->dataProvider instanceof ActiveQueryInterface) {
+        if ($this->dataProvider instanceof ActiveQueryInterface || $this->dataProvider instanceof ActiveDataProvider) {
             $query = $this->dataProvider->query;
             foreach ($query->batch($this->batchSize) as $models) {
                 /**
@@ -104,27 +104,7 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
                 }
             }
         } else {
-            $this->dataProvider->pagination->pageSize = $this->batchSize;
-            $models = $this->dataProvider->getModels();
-
-            while (count($models) > 0) {
-                /**
-                 * @var int $index
-                 * @var \yii\db\ActiveRecord $model
-                 */
-                $keys = $this->dataProvider->getKeys();
-                foreach ($models as $index => $model) {
-                    $this->writeRow($model, $keys[$index], $index);
-                }
-
-                if ($this->dataProvider->pagination) {
-                    $this->dataProvider->pagination->page++;
-                    $this->dataProvider->refresh();
-                    $models = $this->dataProvider->getModels();
-                } else {
-                    $models = [];
-                }
-            }
+            throw new \Exception("Not implemented handler for dataProvider given");
         }
     }
 

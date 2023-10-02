@@ -3,10 +3,11 @@
 namespace Da\export\options;
 
 use Yii;
+use kartik\grid\DataColumn;
+use kartik\grid\GridView;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQueryInterface;
-use yii\grid\DataColumn;
 use yii\helpers\Inflector;
 
 trait GridViewTrait
@@ -35,7 +36,7 @@ trait GridViewTrait
             } else {
                 $column = Yii::createObject(array_merge([
                     'class' => $this->dataColumnClass ? : DataColumn::className(),
-                    'grid' => $this,
+                    'grid' => new GridView(["dataProvider" => $this->dataProvider]),
                 ], $column));
             }
             if (!$column->visible) {
@@ -57,8 +58,8 @@ trait GridViewTrait
         }
 
         return Yii::createObject([
-            'class' => $this->dataColumnClass ? : DataColumn::className(),
-            'grid' => $this,
+            'class' => $this->dataColumnClass ?: DataColumn::className(),
+            'grid' => new GridView(["dataProvider" => $this->dataProvider]),
             'attribute' => $matches[1],
             'format' => isset($matches[3]) ? $matches[3] : 'text',
             'label' => isset($matches[5]) ? $matches[5] : null,
