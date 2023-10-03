@@ -2,7 +2,7 @@
 
 namespace Da\export;
 
-class GridView extends \yii\grid\GridView
+class GridView extends \kartik\grid\GridView
 {
     public $layout = "{export}\n{summary}\n{items}\n{pager}";
 
@@ -14,7 +14,7 @@ class GridView extends \yii\grid\GridView
     /**
      * @inheritdoc
      */
-    public function run ()
+    public function run()
     {
         $exportMenu = $this->renderExportMenu();
         $this->layout = strtr(
@@ -33,7 +33,7 @@ class GridView extends \yii\grid\GridView
      * @return string
      * @throws \Exception
      */
-    public function renderExportMenu ()
+    public function renderExportMenu()
     {
         $exportConfig = $this->exportConfig();
 
@@ -45,7 +45,7 @@ class GridView extends \yii\grid\GridView
      *
      * @return array
      */
-    private function exportConfig ()
+    private function exportConfig()
     {
         $exportConfig = $this->exportConfig;
         if (empty($exportConfig)) {
