@@ -22,30 +22,3 @@ echo Dropdown::widget($dropDownOptions);
 ActiveForm::end();
 
 echo Html::endTag('div');
-?>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        $('.dropdown-menu').on('click', 'li', function(e) {
-            const target = e.target;
-            if (target.tagName === 'A') {
-                e.preventDefault();
-                const selectedOption = this.getAttribute('data-id');;
-                const form = document.getElementById('w0'); // TODO: NOT HARDCODE
-                const exportRequestParam = document.getElementsByName("<?= $exportRequestParam ?>")[0];
-
-                if (!exportRequestParam || !selectedOption) {
-                    return;
-                }
-
-                exportRequestParam.setAttribute('value', selectedOption)
-
-                /**Object URL used to recover query strings on URL */
-                form.setAttribute('action', (new URL(window.location.href)).toString())
-                /** FORCE FORM METHOD */
-                form.setAttribute('method', 'post')
-                form.submit();
-            }
-        });
-    });
-</script>
