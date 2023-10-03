@@ -23,20 +23,21 @@ trait GridViewTrait
      * @param $columns array of columns
      * @return array of columns
      */
-    protected function initColumns ()
+    protected function initColumns()
     {
         if (empty($this->columns)) {
             $this->guessColumns();
         }
+        $grid = new GridView(["dataProvider" => $this->dataProvider]);
         foreach ($this->columns as $i => $column) {
             if (is_string($column)) {
                 $column = $this->createDataColumn($column);
-            } else if ($column instanceof DataColumn) {
+            } elseif ($column instanceof DataColumn) {
                 continue;
             } else {
                 $column = Yii::createObject(array_merge([
-                    'class' => $this->dataColumnClass ? : DataColumn::className(),
-                    'grid' => new GridView(["dataProvider" => $this->dataProvider]),
+                    'class' => $this->dataColumnClass ?: DataColumn::className(),
+                    'grid' => $grid,
                 ], $column));
             }
             if (!$column->visible) {
@@ -81,7 +82,7 @@ trait GridViewTrait
                 /**
                  * @var \yii\db\ActiveRecord $model
                  */
-                $model = new $provider->query->modelClass;
+                $model = new $provider->query->modelClass();
                 $label = $model->getAttributeLabel($col->attribute);
             } else {
                 $models = $provider->getModels();
