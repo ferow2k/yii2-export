@@ -2,10 +2,10 @@
 
 namespace Da\export;
 
-use Da\export\options\CsvOption;
 use Da\export\options\OptionInterface;
-use Da\export\options\OptionAbstract;
+use Da\export\options\CsvOption;
 use Da\export\options\XlsxOption;
+use Da\export\options\OdsOption;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Widget;
@@ -17,7 +17,7 @@ class ExportMenu extends Widget
      * Export formats
      */
     public const FORMAT_CSV = 'CSV';
-    public const FORMAT_EXCEL = 'Excel5';
+    public const FORMAT_ODS = 'ODS';
     public const FORMAT_EXCEL_X = 'Excel2007';
 
     /**
@@ -282,7 +282,6 @@ jQuery('#{$id}').exportMenu({
     'exportRequestParam': '{$exportRequestParam}'
 });
 SCRIPT;
-
     }
 
     /**
@@ -392,14 +391,14 @@ SCRIPT;
                     'url' => 'javascript:;',
                     'className' => CsvOption::class,
                 ],
-                self::FORMAT_EXCEL => [
-                    'label' => 'Excel 95 +',
+                self::FORMAT_ODS => [
+                    'label' => 'ODS',
                     'options' => [
-                        'title' => 'Microsoft Excel 95+ (xls)',
-                        'data-id' => self::FORMAT_EXCEL,
+                        'title' => 'OpenDocument Spreadsheet (ods)',
+                        'data-id' => self::FORMAT_ODS,
                     ],
                     'url' => 'javascript:;',
-                    'className' => XlsxOption::class,
+                    'className' => OdsOption::class,
                 ],
                 self::FORMAT_EXCEL_X => [
                     'label' => 'Excel 2007+',
@@ -409,7 +408,7 @@ SCRIPT;
                     ],
                     'url' => 'javascript:;',
                     'className' => XlsxOption::class,
-                ]
+                ],
             ];
         }
         return $this->dropDownItems;

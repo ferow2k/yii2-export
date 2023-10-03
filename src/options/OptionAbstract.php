@@ -2,7 +2,6 @@
 
 namespace Da\export\options;
 
-use OpenSpout\Writer\Common\Creator\WriterEntityFactory;
 use Yii;
 use yii\base\BaseObject;
 use yii\data\ActiveDataProvider;
@@ -44,15 +43,11 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
      */
     public $target;
 
-    public $spoutObject;
-
     /**
      * @inheritdoc
      */
     public function init()
     {
-        parent::init();
-
         $this->initColumns();
 
         if (empty($this->filename)) {
@@ -77,7 +72,7 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
             $head = ($column instanceof DataColumn) ? $this->getColumnHeader($column) : $column->header;
             $rowArray[] = $head;
         }
-        $this->spoutObject->addRow(WriterEntityFactory::createRowFromArray($rowArray));
+        $this->addRow($rowArray);
     }
 
     /**
@@ -91,7 +86,7 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
             return;
         }
 
-        if ($this->dataProvider instanceof ActiveQueryInterface || $this->dataProvider instanceof ActiveDataProvider) {
+        if ($this->dataProvider instanceof ActiveQueryInterface) {
             $query = $this->dataProvider->query;
             foreach ($query->batch($this->batchSize) as $models) {
                 /**
@@ -104,7 +99,28 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
                 }
             }
         } else {
-            throw new \Exception("Not implemented handler for dataProvider given");
+            $this->dataProvider->pagination->pageSize = $this->batchSize;
+            $this->dataProvider->refresh();
+            $models = $this->dataProvider->getModels();
+
+            while (count($models) > 0) {
+                /**
+                 * @var int $index
+                 * @var \yii\db\ActiveRecord $model
+                 */
+                $keys = $this->dataProvider->getKeys();
+                foreach ($models as $index => $model) {
+                    $this->writeRow($model, $keys[$index], $index);
+                }
+
+                if ($this->dataProvider->pagination) {
+                    $this->dataProvider->pagination->page++;
+                    $this->dataProvider->refresh();
+                    $models = $this->dataProvider->getModels();
+                } else {
+                    $models = [];
+                }
+            }
         }
     }
 
@@ -120,12 +136,13 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
     {
         $row = [];
         foreach ($this->columns as $column) {
-            $value = $this->getColumnValue($model, $key, $index, $column);
-            $row[] = $value;
+            $row[] = $this->getColumnValue($model, $key, $index, $column);
         }
-        $this->spoutObject->addRow(WriterEntityFactory::createRowFromArray($row));
+        $this->addRow($row);
         unset($row);
     }
+
+    abstract protected function addRow(array $row);
 
     /**
      * Get the column generated value from the column
@@ -171,7 +188,7 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
             /** @var Column $column */
             $row[] = trim($column->footer) !== '' ? $column->footer : '';
         }
-        $this->spoutObject->addRow(WriterEntityFactory::createRowFromArray($row));
+        $this->addRow($row);
     }
 
     protected function writeFile()

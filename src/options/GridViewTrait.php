@@ -32,7 +32,7 @@ trait GridViewTrait
         foreach ($this->columns as $i => $column) {
             if (is_string($column)) {
                 $column = $this->createDataColumn($column);
-            } elseif ($column instanceof DataColumn) {
+            } else if ($column instanceof DataColumn) {
                 continue;
             } else {
                 $column = Yii::createObject(array_merge([
@@ -82,7 +82,7 @@ trait GridViewTrait
                 /**
                  * @var \yii\db\ActiveRecord $model
                  */
-                $model = new $provider->query->modelClass();
+                $model = new $provider->query->modelClass;
                 $label = $model->getAttributeLabel($col->attribute);
             } else {
                 $models = $provider->getModels();

@@ -1,4 +1,4 @@
-(function($) {
+(function ($) {
 
     $.exportMenu = function (element, options) {
 
@@ -11,8 +11,7 @@
 
         var $element = $(element),
             $form = $("#" + options.formId),
-            $exportRequestParam = $("input[name='" + options.exportRequestParam + "']"),
-            element = element;
+            $exportRequestParam = $("input[name='" + options.exportRequestParam + "']");
 
         plugin.init = function () {
             plugin.settings = $.extend({}, defaults, options);
