@@ -2,48 +2,54 @@
 
 namespace Da\export\options;
 
-use OpenSpout\Writer\Common\Creator\WriterEntityFactory;
-use OpenSpout\Writer\WriterMultiSheetsAbstract;
+use OpenSpout\Common\Entity\Row;
+use OpenSpout\Common\Entity\Style\Style;
+use OpenSpout\Writer\ODS\Writer;
+use OpenSpout\Writer\ODS\Options;
 use Yii;
 use Da\export\ExportMenu;
+use OpenSpout\Common\Entity\Cell;
 
 class OdsOption extends SpoutOption
 {
-    public WriterMultiSheetsAbstract $spout;
+    public Writer $spout;
+    public Options $options;
     public string $extension = '.ods';
 
     public function createWriter()
     {
-        $this->spout = WriterEntityFactory::createODSWriter();
+        $this->options = new Options();
+        $this->spout = new Writer($this->options);
     }
 
     protected function setOptions()
     {
-        foreach($this->maxColumnLengths as $key => $value) {
-            $this->spout->setColumnWidth($key, $value);
+        foreach ($this->maxColumnLengths as $key => $value) {
+            $this->options->setColumnWidth($value, $key + 1);
         }
     }
 
-    public function openToBrowser()
+    public function openWriter()
     {
-        $this->spout->openToBrowser($this->filename . $this->extension);
+        switch ($this->target) {
+            case ExportMenu::TARGET_SELF:
+            case ExportMenu::TARGET_BLANK:
+                Yii::$app->controller->layout = false;
+                $this->spout->openToBrowser($this->filename . $this->extension);
+                break;
+            case ExportMenu::TARGET_QUEUE:
+            default:
+                Yii::$app->controller->layout = false;
+                $this->spout->openToBrowser($this->filename . $this->extension);
+                break;
+        }
     }
 
     public function process()
     {
         $this->createWriter();
-        switch ($this->target) {
-            case ExportMenu::TARGET_SELF:
-            case ExportMenu::TARGET_BLANK:
-                Yii::$app->controller->layout = false;
-                $this->openToBrowser();
-                break;
-            case ExportMenu::TARGET_QUEUE:
-            default:
-                Yii::$app->controller->layout = false;
-                $this->openToBrowser();
-                break;
-        }
+        
+        $this->openWriter();
 
         $this->writeFile();
 
@@ -54,9 +60,17 @@ class OdsOption extends SpoutOption
 
     public function addRow(array $row)
     {
-        foreach($row as $key => $value) {
-            $this->maxColumnLengths[$key] = max($this->maxColumnLengths[$key] ?? 0, strlen($value));
+        $cells = [];
+        foreach ($row as $key => $value) {
+            $cellStyle = null;
+            if (is_string($value)) {
+                $this->maxColumnLengths[$key] = min(max($this->maxColumnLengths[$key] ?? 0, (!empty($value) ? strlen($value) : 0) * 8), 800);
+            }
+            if ($value instanceof \DateTime) {
+                $cellStyle = (new Style())->setFormat('dd/mm/yyyy');
+            }
+            $cells[] = Cell::fromValue($value, $cellStyle);
         }
-        $this->spout->addRow(WriterEntityFactory::createRowFromArray($row));
+        $this->spout->addRow(new Row($cells));
     }
 }

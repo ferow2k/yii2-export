@@ -1,43 +1,49 @@
 <?php
 
 namespace Da\export\options;
-use OpenSpout\Writer\Common\Creator\WriterEntityFactory;
-use OpenSpout\Writer\WriterInterface;
+
+use OpenSpout\Common\Entity\Row;
+use OpenSpout\Writer\CSV\Writer;
+use OpenSpout\Writer\CSV\Options;
 use Yii;
 use Da\export\ExportMenu;
+use OpenSpout\Common\Entity\Cell;
 
 class CsvOption extends SpoutOption
 {
-    public WriterInterface $spout;
+    public Writer $spout;
+    public Options $options;
     public string $extension = '.csv';
 
     public function createWriter()
     {
-        $this->spout = WriterEntityFactory::createCSVWriter();
+        $this->options = new Options();
+        $this->spout = new Writer($this->options);
     }
     
     protected function setOptions() {}
 
-    public function openToBrowser()
+    public function openWriter()
     {
-        $this->spout->openToBrowser($this->filename . $this->extension);
-    }
-
-    public function process()
-    {
-        $this->createWriter();
         switch ($this->target) {
             case ExportMenu::TARGET_SELF:
             case ExportMenu::TARGET_BLANK:
                 Yii::$app->controller->layout = false;
-                $this->openToBrowser();
+                $this->spout->openToBrowser($this->filename . $this->extension);
                 break;
             case ExportMenu::TARGET_QUEUE:
             default:
                 Yii::$app->controller->layout = false;
-                $this->openToBrowser();
+                $this->spout->openToBrowser($this->filename . $this->extension);
                 break;
         }
+    }
+    
+    public function process()
+    {
+        $this->createWriter();
+        
+        $this->openWriter();
 
         $this->writeFile();
 
@@ -48,9 +54,13 @@ class CsvOption extends SpoutOption
 
     public function addRow(array $row)
     {
-        foreach($row as $key => $value) {
-            $this->maxColumnLengths[$key] = max($this->maxColumnLengths[$key] ?? 0, strlen($value));
-        }
-        $this->spout->addRow(WriterEntityFactory::createRowFromArray($row));
+        $row = array_map(function ($value) {
+            if ($value instanceof \DateTime) {
+                return $value->format('Y-m-d H:i:s');
+            } else {
+                return $value;
+            }
+        }, $row);
+        $this->spout->addRow(Row::fromValues($row));
     }
 }

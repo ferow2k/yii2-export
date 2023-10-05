@@ -160,7 +160,14 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
             return '';
         } elseif ($column instanceof DataColumn) {
             $val = $column->getDataCellValue($model, $key, $index);
-            return Yii::$app->formatter->format($val, $column->format);
+            if ($column->format == 'currency' || $column->format == 'decimal' || $column->format == 'percent') {
+                return floatval($val);
+            } elseif ($column->format == 'date' || $column->format == 'datetime') {
+                return $val ? new \DateTime($val) : null;
+            } else {
+                return $val;
+            }
+            //return Yii::$app->formatter->format($val, $column->format);
         } elseif ($column instanceof Column) {
             return $column->renderDataCell($model, $key, $index);
         }

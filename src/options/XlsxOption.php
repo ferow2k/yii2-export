@@ -2,43 +2,54 @@
 
 namespace Da\export\options;
 
-use OpenSpout\Writer\Common\Creator\WriterEntityFactory;
-use OpenSpout\Writer\WriterMultiSheetsAbstract;
+use OpenSpout\Common\Entity\Row;
+use OpenSpout\Common\Entity\Style\Style;
+use OpenSpout\Writer\XLSX\Writer;
+use OpenSpout\Writer\XLSX\Options;
 use Yii;
 use Da\export\ExportMenu;
+use OpenSpout\Common\Entity\Cell;
 
 class XlsxOption extends SpoutOption
 {
-    public WriterMultiSheetsAbstract $spout;
+    public Writer $spout;
+    public Options $options;
     public string $extension = '.xlsx';
-
-    public $firstRowWritten = false;
 
     public function createWriter()
     {
-        $this->spout = WriterEntityFactory::createXLSXWriter();
+        $this->options = new Options();
+        $this->spout = new Writer($this->options);
     }
 
-    public function openToBrowser()
+    protected function setOptions()
     {
-        $this->spout->openToBrowser($this->filename . $this->extension);
+        foreach ($this->maxColumnLengths as $key => $value) {
+            $this->options->setColumnWidth($value, $key + 1);
+        }
+    }
+
+    public function openWriter()
+    {
+        switch ($this->target) {
+            case ExportMenu::TARGET_SELF:
+            case ExportMenu::TARGET_BLANK:
+                Yii::$app->controller->layout = false;
+                $this->spout->openToBrowser($this->filename . $this->extension);
+                break;
+            case ExportMenu::TARGET_QUEUE:
+            default:
+                Yii::$app->controller->layout = false;
+                $this->spout->openToBrowser($this->filename . $this->extension);
+                break;
+        }
     }
 
     public function process()
     {
         $this->createWriter();
-        switch ($this->target) {
-            case ExportMenu::TARGET_SELF:
-            case ExportMenu::TARGET_BLANK:
-                Yii::$app->controller->layout = false;
-                $this->openToBrowser();
-                break;
-            case ExportMenu::TARGET_QUEUE:
-            default:
-                Yii::$app->controller->layout = false;
-                $this->openToBrowser();
-                break;
-        }
+        
+        $this->openWriter();
 
         $this->writeFile();
 
@@ -49,13 +60,17 @@ class XlsxOption extends SpoutOption
 
     public function addRow(array $row)
     {
-        /*if (!$this->firstRowWritten) {
-            $this->firstRowWritten = true;
-            foreach ($row as $key => $value) {
-                $length = max(10, $value ? strlen($value) : 0) * 1.2;
-                $this->spout->setColumnWidth($length, $key);
+        $cells = [];
+        foreach ($row as $key => $value) {
+            $cellStyle = null;
+            if (is_string($value)) {
+                $this->maxColumnLengths[$key] = min(max($this->maxColumnLengths[$key] ?? 10, $value ? strlen($value) : 0) * 1.02, 80);
             }
-        }*/
-        $this->spout->addRow(WriterEntityFactory::createRowFromArray($row));
+            if ($value instanceof \DateTime) {
+                $cellStyle = (new Style())->setFormat('dd/mm/yyyy');
+            }
+            $cells[] = Cell::fromValue($value, $cellStyle);
+        }
+        $this->spout->addRow(new Row($cells));
     }
 }

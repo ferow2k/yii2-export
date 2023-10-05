@@ -10,6 +10,4 @@ interface OptionInterface
      * @return bool
      */
     public function process();
-
-    public function openToBrowser();
 }
