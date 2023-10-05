@@ -6,17 +6,14 @@ use OpenSpout\Common\Entity\Row;
 use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Writer\XLSX\Writer;
 use OpenSpout\Writer\XLSX\Options;
-use Yii;
-use Da\export\ExportMenu;
 use OpenSpout\Common\Entity\Cell;
 
 class XlsxOption extends SpoutOption
 {
-    public Writer $spout;
-    public Options $options;
-    public string $extension = '.xlsx';
+    protected Options $options;
+    protected string $extension = '.xlsx';
 
-    public function createWriter()
+    protected function createWriter()
     {
         $this->options = new Options();
         $this->spout = new Writer($this->options);
@@ -29,36 +26,7 @@ class XlsxOption extends SpoutOption
         }
     }
 
-    public function openWriter()
-    {
-        switch ($this->target) {
-            case ExportMenu::TARGET_SELF:
-            case ExportMenu::TARGET_BLANK:
-                Yii::$app->controller->layout = false;
-                $this->spout->openToBrowser($this->filename . $this->extension);
-                break;
-            case ExportMenu::TARGET_QUEUE:
-            default:
-                Yii::$app->controller->layout = false;
-                $this->spout->openToBrowser($this->filename . $this->extension);
-                break;
-        }
-    }
-
-    public function process()
-    {
-        $this->createWriter();
-        
-        $this->openWriter();
-
-        $this->writeFile();
-
-        $this->setOptions();
-
-        $this->spout->close();
-    }
-
-    public function addRow(array $row)
+    protected function addRow(array $row)
     {
         $cells = [];
         foreach ($row as $key => $value) {
