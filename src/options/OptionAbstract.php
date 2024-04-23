@@ -2,6 +2,7 @@
 
 namespace Da\export\options;
 
+use NumberFormatter;
 use Yii;
 use yii\base\BaseObject;
 use yii\data\ActiveDataProvider;
@@ -161,14 +162,25 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
             return '';
         } elseif ($column instanceof DataColumn) {
             $val = $column->getDataCellValue($model, $key, $index);
-            if ($column->format == 'currency' || $column->format == 'decimal' || $column->format == 'percent') {
-                return floatval($val);
-            } elseif ($column->format == 'date' || $column->format == 'datetime') {
+
+            if (is_array($column->format)) {
+                $format = $column->format[0];
+                $decimals = $column->format[1];
+                if ($format == 'currency') {
+                    $decimals = isset($column->format[2]) && isset($column->format[2][NumberFormatter::MAX_FRACTION_DIGITS]) ? $column->format[2][NumberFormatter::MAX_FRACTION_DIGITS] : 2;
+                }
+            } else {
+                $format = $column->format;
+                $decimals = 2;
+            }
+
+            if ($format == 'currency' || $format == 'decimal' || $format == 'percent') {
+                return round(floatval($val), $decimals);
+            } elseif ($format == 'date' || $format == 'datetime') {
                 return $val ? new \DateTime($val) : null;
             } else {
                 return $val;
             }
-            //return Yii::$app->formatter->format($val, $column->format);
         } elseif ($column instanceof Column) {
             return $column->renderDataCell($model, $key, $index);
         }
