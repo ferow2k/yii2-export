@@ -165,7 +165,7 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
 
             if (is_array($column->format)) {
                 $format = $column->format[0];
-                $decimals = $column->format[1];
+                $decimals = isset($column->format[1]) ? $column->format[1] : 2;
                 if ($format == 'currency') {
                     $decimals = isset($column->format[2]) && isset($column->format[2][NumberFormatter::MAX_FRACTION_DIGITS]) ? $column->format[2][NumberFormatter::MAX_FRACTION_DIGITS] : 2;
                 }
