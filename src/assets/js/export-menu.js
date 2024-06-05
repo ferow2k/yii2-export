@@ -20,7 +20,7 @@
         };
 
         var listen = function () {
-            $element.on('click', '.dropdown-menu li', changeOption);
+            $element.on('click', '.dropdown-menu li, .dropdown-menu .dropdown-item', changeOption);
         };
 
         var changeOption = function (e) {

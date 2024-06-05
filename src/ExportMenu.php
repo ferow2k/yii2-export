@@ -384,7 +384,7 @@ SCRIPT;
             return [
                 self::FORMAT_CSV => [
                     'label' => 'CSV',
-                    'options' => [
+                    'linkOptions' => [
                         'title' => 'Comma Separated Values',
                         'data-id' => self::FORMAT_CSV,
                     ],
@@ -393,7 +393,7 @@ SCRIPT;
                 ],
                 self::FORMAT_ODS => [
                     'label' => 'ODS',
-                    'options' => [
+                    'linkOptions' => [
                         'title' => 'OpenDocument Spreadsheet (ods)',
                         'data-id' => self::FORMAT_ODS,
                     ],
@@ -402,7 +402,7 @@ SCRIPT;
                 ],
                 self::FORMAT_EXCEL_X => [
                     'label' => 'Excel 2007+',
-                    'options' => [
+                    'linkOptions' => [
                         'title' => 'Microsoft Excel 2007+ (xlsx)',
                         'data-id' => self::FORMAT_EXCEL_X,
                     ],
