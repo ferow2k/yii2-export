@@ -117,7 +117,7 @@ Another configurations:
 
 ```
 [
-    'class' => 'btn btn-default',
+    'class' => 'btn btn-secondary',
     'label' => 'Export',
     'menuOptions' => [
         'class' => 'dropdown-menu dropdown-menu-right'

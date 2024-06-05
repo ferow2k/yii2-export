@@ -66,7 +66,7 @@ class ExportMenu extends Widget
      * @var array the button AND dropDown export menu options.
      * ~~~php
      * [
-     *      'class' => 'btn btn-default',
+     *      'class' => 'btn btn-secondary',
      *      'label' => 'Export',
      *      'menuOptions' => [
      *          'class' => 'dropdown-menu dropdown-menu-right'
@@ -75,7 +75,7 @@ class ExportMenu extends Widget
      * ~~~
      */
     public $dropDownOptions = [
-        'class' => 'btn btn-default'
+        'class' => 'btn btn-secondary'
     ];
 
     /**
@@ -353,7 +353,7 @@ SCRIPT;
         unset($buttonOptions['menuOptions']);
 
         if (empty($buttonOptions['class'])) {
-            $buttonOptions['class'] = 'btn btn-default dropdown-toggle';
+            $buttonOptions['class'] = 'btn btn-secondary dropdown-toggle';
         } else {
             $buttonOptions['class'] .= ' dropdown-toggle';
         }
