@@ -32,7 +32,7 @@ trait GridViewTrait
         foreach ($this->columns as $i => $column) {
             if (is_string($column)) {
                 $column = $this->createDataColumn($column);
-            } else if ($column instanceof DataColumn) {
+            } elseif ($column instanceof DataColumn) {
                 continue;
             } else {
                 $column = Yii::createObject(array_merge([
@@ -40,7 +40,7 @@ trait GridViewTrait
                     'grid' => $grid,
                 ], $column));
             }
-            if (!$column->visible) {
+            if (!$column->visible || $column->hiddenFromExport) {
                 unset($this->columns[$i]);
                 continue;
             }
@@ -82,7 +82,7 @@ trait GridViewTrait
                 /**
                  * @var \yii\db\ActiveRecord $model
                  */
-                $model = new $provider->query->modelClass;
+                $model = new $provider->query->modelClass();
                 $label = $model->getAttributeLabel($col->attribute);
             } else {
                 $models = $provider->getModels();
