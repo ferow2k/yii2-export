@@ -1,7 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use yii\bootstrap\Dropdown;
+use yii\bootstrap4\Dropdown;
 use yii\widgets\ActiveForm;
 
 /**
