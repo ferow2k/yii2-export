@@ -362,8 +362,8 @@ SCRIPT;
             $buttonOptions['title'] = "Export data in selected format";
         }
 
-        if (empty($buttonOptions['data-toggle'])) {
-            $buttonOptions['data-toggle'] = "dropdown";
+        if (empty($buttonOptions['data-bs-toggle'])) {
+            $buttonOptions['data-bs-toggle'] = "dropdown";
         }
 
         if (empty($buttonOptions['aria-expanded'])) {
