@@ -175,7 +175,8 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
             }
 
             if ($format == 'currency' || $format == 'decimal' || $format == 'percent') {
-                return round(floatval($val), $decimals);
+                $roundedValue = round(floatval($val), $decimals);
+                return number_format($roundedValue, $decimals, ',', '.');
             } elseif ($format == 'date' || $format == 'datetime') {
                 return $val ? new \DateTime($val) : null;
             } else {
