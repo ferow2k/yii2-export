@@ -32,7 +32,7 @@ class XlsxOption extends SpoutOption
         foreach ($row as $key => $value) {
             $cellStyle = null;
             if (is_string($value)) {
-                $this->maxColumnLengths[$key] = min(max($this->maxColumnLengths[$key] ?? 10, $value ? strlen($value) : 0) * 1.02, 80);
+                $this->maxColumnLengths[$key] = min(max($this->maxColumnLengths[$key] ?? 10, $value ? mb_strlen($value) : 0) * 1.02, 80);
             }
             if ($value instanceof \DateTime) {
                 $cellStyle = (new Style())->setFormat('dd/mm/yyyy');
@@ -40,5 +40,7 @@ class XlsxOption extends SpoutOption
             $cells[] = Cell::fromValue($value, $cellStyle);
         }
         $this->spout->addRow(new Row($cells));
+        // Clear memory
+        unset($cells, $row);
     }
 }

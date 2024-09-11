@@ -31,7 +31,7 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
     /**
      * @var int batch size to fetch the data provider
      */
-    public $batchSize = 500;
+    public $batchSize = 100;
 
     /**
      * @var string filename without extension
@@ -90,40 +90,36 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
         if ($this->dataProvider instanceof ActiveQueryInterface) {
             $query = $this->dataProvider->query;
             foreach ($query->batch($this->batchSize) as $models) {
-                /**
-                 * @var int $index
-                 * @var \yii\db\ActiveRecord $model
-                 */
-                foreach ($models as $index => $model) {
-                    $key = $model->getPrimaryKey();
-                    $this->writeRow($model, $key, $index);
-                }
+                $this->processModels($models);
             }
         } else {
             $this->dataProvider->pagination->page = 0;
             $this->dataProvider->pagination->pageSize = $this->batchSize;
-            $this->dataProvider->refresh();
-            $models = $this->dataProvider->getModels();
 
-            while (count($models) > 0) {
-                /**
-                 * @var int $index
-                 * @var \yii\db\ActiveRecord $model
-                 */
-                $keys = $this->dataProvider->getKeys();
-                foreach ($models as $index => $model) {
-                    $this->writeRow($model, $keys[$index], $index);
-                }
+            do {
+                $this->dataProvider->refresh();
+                $models = $this->dataProvider->getModels();
+                $this->processModels($models);
 
                 if ($this->dataProvider->pagination) {
                     $this->dataProvider->pagination->page++;
-                    $this->dataProvider->refresh();
-                    $models = $this->dataProvider->getModels();
                 } else {
-                    $models = [];
+                    break;
                 }
-            }
+            } while (count($models) > 0);
         }
+    }
+
+    protected function processModels($models)
+    {
+        $keys = $this->dataProvider->getKeys();
+        foreach ($models as $index => $model) {
+            $this->writeRow($model, $keys[$index], $index);
+            // Clear memory
+            unset($models[$index], $keys[$index]);
+        }
+        // Clear memory
+        unset($models, $keys);
     }
 
     /**
