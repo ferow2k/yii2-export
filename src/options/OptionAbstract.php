@@ -186,6 +186,8 @@ abstract class OptionAbstract extends BaseObject implements OptionInterface
                     return $dt;
                 }
                 return null;
+            } elseif ($format == 'boolean') {
+                return $val ? Yii::t('app', 'Yes') : Yii::t('app', 'No');
             } else {
                 return $val;
             }
